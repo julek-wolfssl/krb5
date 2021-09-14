@@ -1256,9 +1256,9 @@ service_https_write(krb5_context context, const krb5_data *realm,
         TRACE_SENDTO_KDC_HTTPS_SEND(context, &conn->addr);
         cm_read(selstate, conn->fd);
         conn->state = READING;
-    } else if (st == WANT_READ) {
+    } else if (st == K5_WANT_READ) {
         cm_read(selstate, conn->fd);
-    } else if (st == WANT_WRITE) {
+    } else if (st == K5_WANT_WRITE) {
         cm_write(selstate, conn->fd);
     } else if (st == ERROR_TLS) {
         TRACE_SENDTO_KDC_HTTPS_ERROR_SEND(context, &conn->addr);
@@ -1307,9 +1307,9 @@ https_read_bytes(krb5_context context, struct conn_state *conn,
     if (st == DONE)
         return TRUE;
 
-    if (st == WANT_READ) {
+    if (st == K5_WANT_READ) {
         cm_read(selstate, conn->fd);
-    } else if (st == WANT_WRITE) {
+    } else if (st == K5_WANT_WRITE) {
         cm_write(selstate, conn->fd);
     } else if (st == ERROR_TLS) {
         TRACE_SENDTO_KDC_HTTPS_ERROR_RECV(context, &conn->addr);

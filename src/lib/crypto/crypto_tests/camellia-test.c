@@ -133,6 +133,10 @@ int main (int argc, char *argv[])
 		argv[0], argv[0]);
 	return 1;
     }
+#ifdef HAVE_LIBWOLFSSL
+    printf("No Camellia support in wolfSSL EVP layer\n");
+    return 0;
+#endif
     init();
     if (argc == 2)
 	vk_test();

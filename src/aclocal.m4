@@ -1696,3 +1696,4 @@ AC_DEFUN(KRB5_AC_PERSISTENT_KEYRING,[
       ]))
 ])dnl
 dnl
+m4_include([m4/pkg.m4])

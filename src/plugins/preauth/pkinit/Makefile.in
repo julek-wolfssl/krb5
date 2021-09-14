@@ -10,7 +10,12 @@ RELDIR=../plugins/preauth/pkinit
 SHLIB_EXPDEPS = \
 	$(TOPLIBD)/libk5crypto$(SHLIBEXT) \
 	$(TOPLIBD)/libkrb5$(SHLIBEXT)
+
+ifeq ($(CRYPTO_IMPL_WOLFSSL),no)
 SHLIB_EXPLIBS= -lkrb5 -lcom_err -lk5crypto -lcrypto $(DL_LIB) $(SUPPORT_LIB) $(LIBS)
+else
+SHLIB_EXPLIBS= -lkrb5 -lcom_err -lk5crypto -lwolfssl $(DL_LIB) $(SUPPORT_LIB) $(LIBS)
+endif
 
 STLIBOBJS= \
 	pkinit_accessor.o \

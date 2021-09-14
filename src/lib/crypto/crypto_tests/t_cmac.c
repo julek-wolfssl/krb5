@@ -99,6 +99,7 @@ check_result(const char *name, const unsigned char *result,
 int
 main(int argc, char **argv)
 {
+#ifndef HAVE_LIBWOLFSSL
     krb5_error_code ret;
     krb5_context context = NULL;
     krb5_keyblock keyblock;
@@ -144,4 +145,9 @@ main(int argc, char **argv)
     printf("All CMAC tests passed.\n");
     krb5_k_free_key(context, key);
     return 0;
+#else
+    printf("All CMAC tests skipped. wolfSSL does not have Camellia support "
+            "in the EVP layer.\n");
+    return 0;
+#endif
 }

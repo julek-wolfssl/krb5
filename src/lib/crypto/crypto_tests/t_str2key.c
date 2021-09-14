@@ -523,6 +523,7 @@ struct test {
         FALSE
     },
 
+#ifndef HAVE_LIBWOLFSSL
     /* The same inputs applied to Camellia enctypes. */
     {
         ENCTYPE_CAMELLIA128_CTS_CMAC,
@@ -671,6 +672,7 @@ struct test {
         0,
         TRUE
     },
+#endif
     /* Check for KRB5_ERR_BAD_S2K_PARAMS return when weak iteration counts are
      * forbidden. */
     {
