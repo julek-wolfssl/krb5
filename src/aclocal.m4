@@ -1677,3 +1677,4 @@ if test "$with_ldap" = yes; then
   OPENLDAP_PLUGIN=yes
 fi
 ])dnl
+m4_include([m4/pkg.m4])

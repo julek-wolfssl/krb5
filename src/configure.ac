@@ -261,6 +261,7 @@ AC_SUBST(audit_plugin)
 
 # WITH_CRYPTO_IMPL
 
+CRYPTO_IMPL_WOLFSSL=no
 CRYPTO_IMPL="builtin"
 AC_ARG_WITH([crypto-impl],
 AC_HELP_STRING([--with-crypto-impl=IMPL], [use specified crypto implementation @<:@builtin@:>@]),
@@ -273,6 +274,35 @@ builtin)
 openssl)
   AC_CHECK_LIB(crypto, PKCS7_get_signer_info)
   ;;
+wolfssl)
+  CRYPTO_IMPL=openssl
+  CRYPTO_IMPL_WOLFSSL=yes
+  if test -z "${WOLFSSL_CFLAGS}" -a -z "${WOLFSSL_LIBS}"; then
+	# If the user did not explicitly specify flags, try to autodetect.
+    PKG_CHECK_MODULES(
+      [WOLFSSL],
+      [wolfssl],
+      [WOLFSSL_FOUND=yes],
+      [WOLFSSL_FOUND=no]
+    )
+    PKG_CHECK_VAR(
+      [WOLFSSL_INCLUDEDIR],
+      [wolfssl],
+      [includedir],
+      [WOLFSSL_FOUND=yes],
+      [WOLFSSL_FOUND=no]
+    )
+    if test "x$WOLFSSL_FOUND" = "xno" ; then
+      AC_MSG_ERROR([wolfSSL not found!])
+    fi
+    WOLFSSL_CFLAGS="${WOLFSSL_CFLAGS} -I${WOLFSSL_INCLUDEDIR}/wolfssl"
+  fi
+  CFLAGS="${CFLAGS} ${WOLFSSL_CFLAGS}"
+  LIBS="${LIBS} ${WOLFSSL_LIBS}"
+  AC_CHECK_LIB(wolfssl, PKCS7_get_signer_info)
+  AC_DEFINE(HAVE_LIBCRYPTO, 1, [wolfSSL])
+  AC_DEFINE(EXTERNAL_OPTS_OPENVPN, 1, [wolfSSL options.h include])
+  ;;
 *)
   AC_MSG_ERROR([Unknown crypto implementation $withval])
   ;;
@@ -281,6 +311,9 @@ AC_CONFIG_COMMANDS(CRYPTO_IMPL, , CRYPTO_IMPL=$CRYPTO_IMPL)
 AC_SUBST(CRYPTO_IMPL)
 AC_SUBST(CRYPTO_IMPL_CFLAGS)
 AC_SUBST(CRYPTO_IMPL_LIBS)
+AC_SUBST(CRYPTO_IMPL_WOLFSSL)
+# Might not be necessary
+AC_CONFIG_COMMANDS(CRYPTO_IMPL_WOLFSSL, , CRYPTO_IMPL_WOLFSSL=$CRYPTO_IMPL_WOLFSSL)
 
 AC_ARG_WITH([prng-alg],
 AC_HELP_STRING([--with-prng-alg=ALG], [use specified PRNG algorithm. @<:@fortuna@:>@]),
@@ -300,6 +333,36 @@ AC_HELP_STRING([--with-tls-impl=IMPL],
                [use specified TLS implementation @<:@auto@:>@]),
 [TLS_IMPL=$withval],[TLS_IMPL=auto])
 case "$TLS_IMPL" in
+wolfssl)
+  if test -z "${WOLFSSL_CFLAGS}" -a -z "${WOLFSSL_LIBS}"; then
+	# If the user did not explicitly specify flags, try to autodetect.
+    PKG_CHECK_MODULES(
+      [WOLFSSL],
+      [wolfssl],
+      [WOLFSSL_FOUND=yes],
+      [WOLFSSL_FOUND=no]
+    )
+    PKG_CHECK_VAR(
+      [WOLFSSL_INCLUDEDIR],
+      [wolfssl],
+      [includedir],
+      [WOLFSSL_FOUND=yes],
+      [WOLFSSL_FOUND=no]
+    )
+    if test "x$WOLFSSL_FOUND" = "xno" ; then
+      AC_MSG_ERROR([wolfSSL not found!])
+    fi
+    WOLFSSL_CFLAGS="${WOLFSSL_CFLAGS} -I${WOLFSSL_INCLUDEDIR}/wolfssl"
+  fi
+  CFLAGS="${CFLAGS} ${WOLFSSL_CFLAGS}"
+  LIBS="${LIBS} ${WOLFSSL_LIBS}"
+  TLS_IMPL_LIBS="${WOLFSSL_LIBS}"
+  TLS_IMPL=openssl
+  AC_CHECK_LIB(wolfssl, wolfSSL_CTX_new)
+  AC_MSG_NOTICE([TLS module will use wolfSSL])
+  AC_DEFINE(TLS_IMPL_OPENSSL, 1, [wolfSSL])
+  AC_DEFINE(EXTERNAL_OPTS_OPENVPN, 1, [wolfSSL options.h include])
+  ;;
 openssl|auto)
   AC_CHECK_LIB(ssl,SSL_CTX_new,[have_lib_ssl=true],[have_lib_ssl=false],
                -lcrypto)
@@ -1112,6 +1175,9 @@ if test "$enable_pkinit" = yes || test "$enable_pkinit" = try; then
 #endif
 int i = 1;
 ])], k5_cv_openssl_version_okay=yes, k5_cv_openssl_version_okay=no)])
+  if test "$CRYPTO_IMPL_WOLFSSL" = yes; then
+    AC_MSG_ERROR([No CMS API support with wolfSSL.])
+  fi
   old_LIBS="$LIBS"
   AC_CHECK_LIB(crypto, PKCS7_get_signer_info)
   LIBS="$old_LIBS"
@@ -1537,3 +1603,6 @@ V5_AC_OUTPUT_MAKEFILE(.
 	tests tests/asn.1 tests/create tests/hammer tests/verify tests/gssapi
 	tests/dejagnu tests/threads tests/shlib tests/gss-threads tests/misc
 )
+
+echo cflags: $CFLAGS
+echo libs: $LIBS

@@ -506,9 +506,9 @@ write_tls(krb5_context context, k5_tls_handle handle, const void *data,
 
     e = SSL_get_error(handle->ssl, nwritten);
     if (e == SSL_ERROR_WANT_READ)
-        return WANT_READ;
+        return K5_WANT_READ;
     else if (e == SSL_ERROR_WANT_WRITE)
-        return WANT_WRITE;
+        return K5_WANT_WRITE;
     flush_errors(context);
     return ERROR_TLS;
 }
@@ -534,9 +534,9 @@ read_tls(krb5_context context, k5_tls_handle handle, void *data,
 
     e = SSL_get_error(handle->ssl, nread);
     if (e == SSL_ERROR_WANT_READ)
-        return WANT_READ;
+        return K5_WANT_READ;
     else if (e == SSL_ERROR_WANT_WRITE)
-        return WANT_WRITE;
+        return K5_WANT_WRITE;
 
     if (e == SSL_ERROR_ZERO_RETURN || (e == SSL_ERROR_SYSCALL && nread == 0))
         return DONE;

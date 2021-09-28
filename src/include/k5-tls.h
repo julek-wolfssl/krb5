@@ -47,7 +47,7 @@
 typedef struct k5_tls_handle_st *k5_tls_handle;
 
 typedef enum {
-    DATA_READ, DONE, WANT_READ, WANT_WRITE, ERROR_TLS
+    DATA_READ, DONE, K5_WANT_READ, K5_WANT_WRITE, ERROR_TLS
 } k5_tls_status;
 
 /*

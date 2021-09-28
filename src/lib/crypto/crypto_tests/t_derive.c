@@ -137,6 +137,7 @@ struct test {
           "\xD7\xBB\xA9\x07\x76\xD8\x12\x6D\x91\xF3\x4F\x31\x01\xAE\xA8\xBA" }
     },
 
+#ifndef HAVE_LIBWOLFSSL
     /* Kc, Ke, Ki for a Camellia-128 key */
     {
         ENCTYPE_CAMELLIA128_CTS_CMAC,
@@ -200,6 +201,7 @@ struct test {
           "\xFA\x62\x4F\xA0\xE5\x23\x99\x3F\xA3\x88\xAE\xFD\xC6\x7E\x67\xEB"
           "\xCD\x8C\x08\xE8\xA0\x24\x6B\x1D\x73\xB0\xD1\xDD\x9F\xC5\x82\xB0" }
     },
+#endif
 
     /* Kc, Ke, Ki for an aes128-sha2 key. */
     {

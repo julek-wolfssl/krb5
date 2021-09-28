@@ -144,22 +144,6 @@ set passes {
 	{dummy=[verbose -log "aes256-sha2 enctype"]}
     }
     {
-	camellia-only
-	mode=udp
-	des3_krbtgt=0
-	{supported_enctypes=camellia256-cts:normal}
-	{permitted_enctypes(kdc)=camellia256-cts}
-	{permitted_enctypes(replica)=camellia256-cts}
-	{permitted_enctypes(client)=camellia256-cts}
-	{permitted_enctypes(server)=camellia256-cts}
-	{allow_weak_crypto(kdc)=false}
-	{allow_weak_crypto(replica)=false}
-	{allow_weak_crypto(client)=false}
-	{allow_weak_crypto(server)=false}
-	{master_key_type=camellia256-cts}
-	{dummy=[verbose -log "Camellia-256 enctype"]}
-    }
-    {
 	aes-des3
 	mode=udp
 	des3_krbtgt=0

@@ -74,11 +74,13 @@ xorblock(unsigned char *out, const unsigned char *in)
 static const EVP_CIPHER *
 map_mode(unsigned int len)
 {
+#ifndef HAVE_LIBWOLFSSL
     if (len==16)
         return EVP_camellia_128_cbc();
     if (len==32)
         return EVP_camellia_256_cbc();
     else
+#endif
         return NULL;
 }
 
@@ -154,6 +156,7 @@ static krb5_error_code
 cts_encr(krb5_key key, const krb5_data *ivec, krb5_crypto_iov *data,
          size_t num_data, size_t dlen)
 {
+#ifndef HAVE_LIBWOLFSSL
     int                    ret = 0;
     size_t                 size = 0;
     unsigned char         *oblock = NULL, *dbuf = NULL;
@@ -200,12 +203,16 @@ cts_encr(krb5_key key, const krb5_data *ivec, krb5_crypto_iov *data,
     OPENSSL_free(dbuf);
 
     return ret;
+#else
+    return KRB5_CRYPTO_INTERNAL;
+#endif
 }
 
 static krb5_error_code
 cts_decr(krb5_key key, const krb5_data *ivec, krb5_crypto_iov *data,
          size_t num_data, size_t dlen)
 {
+#ifndef HAVE_LIBWOLFSSL
     int                    ret = 0;
     size_t                 size = 0;
     unsigned char         *oblock = NULL;
@@ -253,6 +260,9 @@ cts_decr(krb5_key key, const krb5_data *ivec, krb5_crypto_iov *data,
     OPENSSL_free(dbuf);
 
     return ret;
+#else
+    return KRB5_CRYPTO_INTERNAL;
+#endif
 }
 
 static krb5_error_code
@@ -300,6 +310,7 @@ krb5int_camellia_cbc_mac(krb5_key key, const krb5_crypto_iov *data,
                          size_t num_data, const krb5_data *iv,
                          krb5_data *output)
 {
+#ifndef HAVE_LIBWOLFSSL
     CAMELLIA_KEY enck;
     unsigned char blockY[CAMELLIA_BLOCK_SIZE], blockB[CAMELLIA_BLOCK_SIZE];
     struct iov_cursor cursor;
@@ -325,6 +336,9 @@ krb5int_camellia_cbc_mac(krb5_key key, const krb5_crypto_iov *data,
     memcpy(output->data, blockY, CAMELLIA_BLOCK_SIZE);
 
     return 0;
+#else
+    return KRB5_CRYPTO_INTERNAL;
+#endif
 }
 
 static krb5_error_code
